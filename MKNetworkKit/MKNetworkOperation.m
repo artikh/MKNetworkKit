@@ -1380,7 +1380,7 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
   if([self responseData] == nil) return nil;
   NSError *error = nil;
   id returnValue = [NSJSONSerialization JSONObjectWithData:[self responseData] options:NSJSONReadingAllowFragments error:&error];
-  if(error) DLog(@"JSON Parsing Error: %@", error);
+  if(error) DLog(@"JSON Parsing Error: %@\n%@", error, self.curlCommandLineString);
   return returnValue;
 }
 
@@ -1398,7 +1398,7 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
     id returnValue = [NSJSONSerialization JSONObjectWithData:[self responseData] options:0 error:&error];
     if(error) {
       
-      DLog(@"JSON Parsing Error: %@", error);
+      DLog(@"JSON Parsing Error: %@\n%@", error, self.completionBlock);
       jsonDecompressionHandler(nil);
       return;
     }
