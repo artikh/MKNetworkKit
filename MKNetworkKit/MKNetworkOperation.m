@@ -515,7 +515,7 @@ OSStatus extractIdentityAndTrust(CFDataRef inPKCS12Data,
 
 -(void) setUploadStream:(NSInputStream*) inputStream {
   
-#warning Method not tested yet.
+//#warning Method not tested yet.
   self.request.HTTPBodyStream = inputStream;
 }
 
@@ -573,10 +573,11 @@ OSStatus extractIdentityAndTrust(CFDataRef inPKCS12Data,
     
     [self.request setHTTPMethod:method];
     
+		/*
     [self.request setValue:[NSString stringWithFormat:@"%@, en-us",
                             [[NSLocale preferredLanguages] componentsJoinedByString:@", "]
                             ] forHTTPHeaderField:@"Accept-Language"];
-    
+    */
     if (([method isEqualToString:@"POST"] ||
          [method isEqualToString:@"PUT"]) && (params && [params count] > 0)) {
       
@@ -643,7 +644,11 @@ OSStatus extractIdentityAndTrust(CFDataRef inPKCS12Data,
         [displayString appendFormat:@" %@ \"%@=%@\"", option, key, obj];
       }];
     } else {
-      [displayString appendFormat:@" -d \"%@\"", [self encodedPostDataString]];
+			NSString *encodedPostDataString = self.encodedPostDataString;
+			NSRange quoteRange = [encodedPostDataString rangeOfString:@"\""];
+			if(quoteRange.location != NSNotFound)
+				encodedPostDataString = [encodedPostDataString stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
+			[displayString appendFormat:@" -d \"%@\"", encodedPostDataString];
     }
     
     
@@ -1380,7 +1385,7 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
   if([self responseData] == nil) return nil;
   NSError *error = nil;
   id returnValue = [NSJSONSerialization JSONObjectWithData:[self responseData] options:NSJSONReadingAllowFragments error:&error];
-  if(error) DLog(@"JSON Parsing Error: %@\n%@", error, self.curlCommandLineString);
+  if(error) DLog(@"JSON Parsing Error: %@", error);
   return returnValue;
 }
 
@@ -1398,7 +1403,7 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
     id returnValue = [NSJSONSerialization JSONObjectWithData:[self responseData] options:0 error:&error];
     if(error) {
       
-      DLog(@"JSON Parsing Error: %@\n%@", error, self.completionBlock);
+      DLog(@"JSON Parsing Error: %@", error);
       jsonDecompressionHandler(nil);
       return;
     }
